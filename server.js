@@ -51,5 +51,9 @@ server.get('/gamestate', (req, res) => {
     }
 });
 
+//git add .
+// git commit -m ""
+//git push
+
 
 module.exports = server;
