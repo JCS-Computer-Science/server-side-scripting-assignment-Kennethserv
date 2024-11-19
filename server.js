@@ -51,9 +51,27 @@ server.get('/gamestate', (req, res) => {
     }
 });
 
-//git add .
-// git commit -m ""
-//git push
+server.post('/guess', (req, res) => {
+    const { sessionID, guess } = req.body;
+    const gameState = getSession(sessionID, res);
+
+
+    if (!gameState) return;
+
+
+    const formattedGuess = (guess || "").toLowerCase();
+
+
+    if (formattedGuess.length !== 5) {
+        return res.status(400).send({ error: "Guess must be exactly 5 characters long" });
+    }
+    if (!/^[a-z]+$/.test(formattedGuess)) {
+        return res.status(400).send({ error: "Guess must contain only letters" });
+    }
+    if (gameState.gameOver) {
+        return res.status(400).send({ error: "Game is already over" });
+    }
+})
 
 
 module.exports = server;
