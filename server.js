@@ -71,7 +71,23 @@ server.post('/guess', (req, res) => {
     if (gameState.gameOver) {
         return res.status(400).send({ error: "Game is already over" });
     }
-})
+    const answer = gameState.wordToGuess;
+    const guessResult = formattedGuess.split('').map((letter, index) => {
+        let result;
+        if (letter === answer[index]) {
+            result = 'RIGHT';
+            if (!gameState.rightLetters.includes(letter)) {
+                gameState.rightLetters.push(letter);
+            }
+            gameState.closeLetters = gameState.closeLetters.filter(l => l !== letter);
+        } else if (answer.includes(letter)) {
+            result = 'CLOSE';
+            if (!gameState.rightLetters.includes(letter) && !gameState.closeLetters.includes(letter)) {
+                gameState.closeLetters.push(letter);
+            }
+        }}
+)})
+
 
 
 module.exports = server;
