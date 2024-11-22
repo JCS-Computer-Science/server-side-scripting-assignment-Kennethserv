@@ -85,8 +85,58 @@ server.post('/guess', (req, res) => {
             if (!gameState.rightLetters.includes(letter) && !gameState.closeLetters.includes(letter)) {
                 gameState.closeLetters.push(letter);
             }
-        }}
-)})
+        } else {
+            result = 'WRONG';
+            if (!gameState.wrongLetters.includes(letter)) {
+                gameState.wrongLetters.push(letter);
+            }
+        }
+        return { value: letter, result };
+    });
+
+
+    gameState.guesses.push(guessResult);
+    gameState.remainingGuesses -= 1;
+    gameState.gameOver = isGameOver(gameState, guessResult);
+
+
+    const response = { gameState };
+    if (gameState.gameOver) {
+        response.wordToGuess = answer;
+
+
+        // Track wins and losses based on the number of guesses
+        if (guessResult.every(item => item.result === 'RIGHT')) {
+            gameStats.wins[6 - gameState.remainingGuesses] += 1;
+        } else {
+            gameStats.losses += 1;
+        }
+    }
+
+    res.status(201).send(response);
+});
+
+
+server.delete('/reset', (req, res) => {
+    const sessionID = req.query.sessionID;
+    const gameState = getSession(sessionID, res);
+
+
+    if (!gameState) return;
+
+
+    activeSessions[sessionID] = {
+        wordToGuess: undefined,
+        guesses: [],
+        wrongLetters: [],
+        closeLetters: [],
+        rightLetters: [],
+        remainingGuesses: 6,
+        gameOver: false
+    };
+})
+
+
 
 
 
