@@ -116,7 +116,6 @@ server.post('/guess', (req, res) => {
     res.status(201).send(response);
 });
 
-
 server.delete('/reset', (req, res) => {
     const sessionID = req.query.sessionID;
     const gameState = getSession(sessionID, res);
@@ -134,10 +133,32 @@ server.delete('/reset', (req, res) => {
         remainingGuesses: 6,
         gameOver: false
     };
-})
+    res.status(200).send({ gameState: activeSessions[sessionID] });
+});
 
 
+server.delete('/delete', (req, res) => {
+    const sessionID = req.query.sessionID;
 
+
+    if (!sessionID) {
+        return res.status(400).send({ error: "Session ID is required" });
+    }
+
+
+    if (!activeSessions[sessionID]) {
+        return res.status(404).send({ error: "Session not found" });
+    }
+
+
+    delete activeSessions[sessionID];
+    res.status(204).send();
+});
+
+
+server.get('/gamestats', (req, res) => {
+    res.status(200).send(gameStats);
+});
 
 
 module.exports = server;
